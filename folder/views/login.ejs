@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head><link rel="stylesheet" href="../login.css"/>
+    </head>
+    <body>
+        <div id="login">
+            <h1>LOGIN</h1><br>
+            <form>
+                <!-- <label>Enter username:</label>
+                <input type="text" placeholder="Name" name="name" id="name" required><br><br>
+                <label>Enter Region:</label>
+                <input type="text" placeholder="Region" name="region" id="region" required><br><br> -->
+                <label id="email_l">Enter Email:</label>
+                <input type="email" placeholder="abc@gmail.com" name="email" id="email_i" required><br><br>
+                <label>Enter Password:</label>
+                <input type="password" placeholder="Password" name="password" id="pass" required><br><br>
+                <input type="submit" value="Submit" id="data_submit">
+            </form>
+            <br>
+           <a href="/signup" id="btn">Signup</a><br>
+           <a href="/forgot">Forgot password?</a>
+           <p><%= data %></p>
+           <p id="e" style="display: none;">You need to sign up first</p>
+        </div>    
+    </body>
+    <script src="./login.js">     
+    </script>
+</html>

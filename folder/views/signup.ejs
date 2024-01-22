@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="../signup.css">
+    </head>
+    <body>
+        <div id="signup">
+            <h1>SIGNUP</h1>
+            <label>Enter username:</label>
+            <input type="text" placeholder="Name" name="name" id="name" required><br><br>
+            <label>Enter Region:</label>
+            <input type="text" placeholder="Region" name="region" id="region" required><br><br>
+            <label>Enter Email:</label>
+            <input type="email" placeholder="abc@gmail.com" name="email" id="email_i" required><br><br>
+            <label>Enter Password:</label>
+            <input type="password" placeholder="Password" name="password" id="pass" ><br><br>
+            <a href="/login" class="btn">Login</a>
+            <input type="submit" value="Submit" id="submit_signup">
+        <br><br>
+        <!-- <a href="/login" class="btn">Login</a> -->
+        <!-- <a href="/signupas_seller">Signup as Seller</a> -->
+        <p><%= data %></p>
+        <p id="e" style="display: none;">Your Email already exist</p>
+        <p id="c" style="display: none;">You can login now</p>
+        </div> 
+    </body>
+    <script src="../signup.js"></script>
+</html>
