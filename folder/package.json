@@ -8,6 +8,7 @@
     "jsonwebtoken": "^9.0.2",
     "mailjet": "^0.0.1",
     "mysql": "^2.18.1",
-    "node-mailjet": "^6.0.5"
+    "node-mailjet": "^6.0.5",
+    "socket.io": "^4.7.4"
   }
 }

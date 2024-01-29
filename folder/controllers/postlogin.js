@@ -4,7 +4,7 @@ const jwt=require("jsonwebtoken");
 const bcrypt=require("bcrypt");
 module.exports=function postlogin(req, res) {
 
-    // console.log(req.body);
+    console.log(req.body);
       const name=req.body.name;
        const email=req.body.email;
        const password=req.body.password;

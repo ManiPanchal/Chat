@@ -1,7 +1,27 @@
 const express=require("express");
 const jwt=require("jsonwebtoken");
 const cors=require("cors");
+const http=require("http");
+const {Server}=require("socket.io");
+const app = express();
+const server=http.createServer(app);
 // const dba=require("./sql/db");
+server.listen(8000,()=>{
+    console.log("server started");
+})
+const io=new Server(server,{
+    cors:{
+        origin:"http://localhost:5173",
+        method:["GET","POST"],
+    },});
+io.on("connection",(socket)=>{
+//    console.log("new-message",socket.id);
+   socket.on("new-message",(message)=>{
+       console.log(message);
+       io.emit("server-message",message);
+   });
+})
+
 const postsignup = require("./controllers/postsignup");
 // const getsignup = require("./controllers/getsignup");
 // const getlogin = require("./controllers/getlogin");
@@ -27,15 +47,15 @@ const topregion=require("./controllers/topregion");
 const participants=require("./controllers/participants");
 // const gethome = require("./controllers/gethome");
 // const =require("./controllers/invite");
-const app = express();
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine","ejs");
 // app.use(express.static(__dirname+"/public"));
-app.listen(8000,()=>{
-    console.log("server running at 8000");
-})
+// app.listen(8000,()=>{
+//     console.log("server running at 8000");
+// })
 const verifyJWT=(req,res,next)=>{
     const token=req.headers['x-access-token'];
     // console.log(token);

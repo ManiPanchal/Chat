@@ -416,7 +416,7 @@ function find_m(id,start,count)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`SELECT message,date_message,time, users.name FROM message join users on message.user_id=users.mailtoken  where  message.g_id="${id}" order by date_message desc limit ${start},${count}`, function (err, result, fields) {
+            con.query(`SELECT message,date_message,time, users.name FROM message join users on message.user_id=users.mailtoken  where  message.g_id="${id}" order by date_message desc,message.time desc limit ${start},${count}`, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
