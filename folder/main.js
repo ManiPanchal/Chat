@@ -17,7 +17,7 @@ const io=new Server(server,{
 io.on("connection",(socket)=>{
 //    console.log("new-message",socket.id);
    socket.on("new-message",(message)=>{
-       console.log(message);
+    //    console.log(message);
        io.emit("server-message",message);
    });
 })

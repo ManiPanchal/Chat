@@ -414,6 +414,7 @@ function find_m(id,start,count)
     {
       var con=connection();
           // console.log("connected");
+          // console.log(start,count);
           con.connect(function(err) {
             if (err) throw err;
             con.query(`SELECT message,date_message,time, users.name FROM message join users on message.user_id=users.mailtoken  where  message.g_id="${id}" order by date_message desc,message.time desc limit ${start},${count}`, function (err, result, fields) {
@@ -466,7 +467,7 @@ function find_msg(id,m)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`SELECT message,date_message,time, users.name FROM message join users on message.user_id=users.mailtoken  where  message.g_id="${id}" AND message.message like "%${m}%"`, function (err, result, fields) {
+            con.query(`SELECT count(message) as total FROM message join users on message.user_id=users.mailtoken  where  message.g_id="${id}" AND message.message like "%${m}%"`, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -562,5 +563,26 @@ function find_p(id)
           });
     })    
 }
+function check(u_id,g_id)
+{
+    return new Promise(function(resolve,reject)
+    {
+      var con=connection();
+          // console.log("connected");
+          con.connect(function(err) {
+            if (err) throw err;
+            con.query(`SELECT * from group_user where g_id="${g_id}" AND user_id="${u_id}" AND (state="M" OR state="A")`, function (err, result, fields) {
+              if (err) return reject(err);
+              if(result)
+              {
+                // console.log(result);
+                resolve(JSON.parse(JSON.stringify(result)));
+                  // resolve(1);
+              }
+            });
+          });
+    })    
+}
+
 module.exports={finduser,createuser,findunique,finduser_2,findtoken,update_valid,update_pass,find,find_g,creategroup,find_f
-,find_details,insert_invite,find_mailtoken,update,find_all,insert_g,find_m,insert_m,find_msg,find_top_group,find_top_user,find_top_region,find_p};
+,find_details,insert_invite,find_mailtoken,update,find_all,insert_g,find_m,insert_m,find_msg,find_top_group,find_top_user,find_top_region,find_p,check};
