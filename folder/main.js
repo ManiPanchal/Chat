@@ -16,9 +16,43 @@ const io=new Server(server,{
     },});
 io.on("connection",(socket)=>{
 //    console.log("new-message",socket.id);
-   socket.on("new-message",(message)=>{
-    //    console.log(message);
-       io.emit("server-message",message);
+   socket.on("join_group",(id)=>{
+      socket.join(id);
+   })
+   socket.on("new-message",async (obj)=>{
+    //    console.log(obj);
+      let token=obj.token;
+      let userId=jwt.verify(token,"jwtSecret",(err,decoded)=>{
+           if(err)
+           {
+               return;
+           }
+           else{
+               return decoded.id;
+           }
+      });
+    //   console.log(userId);
+        //  savemsg(obj)
+        let data=await savemsg(obj,userId);
+            // console.log(data);
+            if(data==200)
+            {
+                return;
+            }
+            else{
+                // console.log(data);
+                socket.to(obj.g_id).emit("server-message",data);
+                // io.emit("server-message",data);
+            }
+        
+        // if(data==200)
+        // {
+        //     return;
+        // }
+        // else{
+        //     console.log(data);
+        //     io.emit("server-message",data);
+        // }
    });
 })
 
