@@ -6,12 +6,13 @@ module.exports=(req,res)=>{
     const currentDate2 = new Date(); 
     currentDate2.setDate(currentDate2.getDate() - req.body.v);
     let current2=currentDate2.toISOString().split('T')[0];
-    
+    // console.log(current2,currentDate);
     let data=dbauser.find_top_group(currentDate,current2)
     .then(function(data)
     {
-        if(data.length>0)
+        if(data)
         {
+            // console.log(data);
             res.send(JSON.stringify(data));
             return;
         }

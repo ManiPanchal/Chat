@@ -12,7 +12,7 @@ module.exports=(req,res)=>{
     let data=dbauser.find_top_user(currentDate,current2)
     .then(function(data)
     {
-        if(data.length>0)
+        if(data)
         {
             res.send(JSON.stringify(data));
             return;
