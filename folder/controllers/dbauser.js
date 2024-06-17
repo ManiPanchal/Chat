@@ -182,7 +182,7 @@ function find_g(email)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`SELECT * from groups where group_id in (SELECT g_id from group_user where state!="I" AND user_id=(select mailtoken from users where email="${email}"))`, function (err, result, fields) {
+            con.query(`SELECT * from \`groups\` where group_id in (SELECT g_id from group_user where state!="I" AND user_id=(select mailtoken from users where email="${email}"))`, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -236,12 +236,12 @@ function creategroup(id, name, date, email,time) {
     con.connect(function (err) {
       if (err) throw err;
       con.query(
-        `INSERT INTO groups VALUES("${id}","${name}","${date}","${email}","${time}")`,
+        `INSERT INTO \`groups\` VALUES("${id}","${name}","${date}","${email}","${time}")`,
         function (err, result, fields) {
           if (err) return reject(err);
           if (result) {
             con.query(
-              `SELECT * FROM groups WHERE group_id="${id}"`,
+              `SELECT * FROM \`groups\` WHERE group_id="${id}"`,
               function (err, innerResult, fields) {
                 if (err) return reject(err);
                 if (innerResult) {
@@ -285,7 +285,7 @@ function find_details(id)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`SELECT group_name,group_id,admin_name,start_date,users.name FROM groups  join users on groups.admin_name=users.email where  groups.group_id="${id}" `, function (err, result, fields) {
+            con.query(`SELECT group_name,group_id,admin_name,start_date,users.name FROM \`groups\`  join users on groups.admin_name=users.email where  groups.group_id="${id}" `, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -342,7 +342,7 @@ function find_mailtoken(email)
               if (err) return reject(err);
               if(result)
               {
-                // console.log(result);
+                console.log(result);
                   resolve(JSON.parse(JSON.stringify(result)));
               }
             });
@@ -378,7 +378,7 @@ function find_all(email)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`select * from groups where group_id in (select g_id from group_user where user_id=(select mailtoken from users where email="${email}"))`, function (err, result, fields) {
+            con.query(`select * from \`groups\` where group_id in (select g_id from group_user where user_id=(select mailtoken from users where email="${email}"))`, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -486,9 +486,13 @@ function find_top_group(p,past)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`SELECT groups.group_id,groups.group_name, COUNT(message.message) AS m
-            FROM groups LEFT JOIN message ON groups.group_id = message.g_id where message.date_message BETWEEN "${past}" AND "${p}" GROUP BY groups.group_id ORDER BY m DESC LIMIT 0, 5;
-            `, function (err, result, fields) {
+            con.query(`SELECT groups.group_id, groups.group_name, COUNT(message.message) AS m
+            FROM \`groups\`
+            LEFT JOIN message ON groups.group_id = message.g_id
+            WHERE message.date_message BETWEEN "${p}" AND "${past}"
+            GROUP BY groups.group_id,groups.group_name
+            ORDER BY m DESC
+            LIMIT 0, 5`,function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -507,7 +511,13 @@ function find_top_user(p,past)
           // console.log("connected");
           con.connect(function(err) {
             if (err) throw err;
-            con.query(`select users.name,count(message.message) as m from users left join message on users.mailtoken=message.user_id where message.date_message BETWEEN "${past}" AND "${p}" group by users.mailtoken order by count(message.message) desc limit 0,5`, function (err, result, fields) {
+            con.query(`SELECT users.name, COUNT(message.message) AS m
+            FROM users
+            LEFT JOIN message ON users.mailtoken = message.user_id
+            WHERE message.date_message BETWEEN "${p}" AND "${past}"
+            GROUP BY users.mailtoken,users.name
+            ORDER BY COUNT(message.message) DESC
+            LIMIT 0, 5`, function (err, result, fields) {
               if (err) return reject(err);
               if(result)
               {
@@ -583,6 +593,116 @@ function check(u_id,g_id)
           });
     })    
 }
+function getalluser(id)
+{
+    return new Promise(function(resolve,reject)
+    {
+      var con=connection();
+          // console.log("connected");
+          con.connect(function(err) {
+            if (err) throw err;
+            con.query(`SELECT email,name,mailtoken,region from users where email!="${id}"`, function (err, result, fields) {
+              if (err) return reject(err);
+              if(result)
+              {
+                // console.log(result);
+                resolve(JSON.parse(JSON.stringify(result)));
+                  // resolve(1);
+              }
+            });
+          });
+    })    
+}
+function getuserdetails(id)
+{
+    return new Promise(function(resolve,reject)
+    {
+      var con=connection();
+          // console.log("connected");
+          con.connect(function(err) {
+            if (err) throw err;
+            con.query(`SELECT email,name,mailtoken,region from users where mailtoken="${id}"`, function (err, result, fields) {
+              if (err) return reject(err);
+              if(result)
+              {
+                // console.log(result);
+                resolve(JSON.parse(JSON.stringify(result)));
+                  // resolve(1);
+              }
+            });
+          });
+    })    
+}
 
+function find_msg(id1,start,count,id2)
+{
+  // console.log(id1,start,count,id2);
+    return new Promise(function(resolve,reject)
+    {
+      var con=connection();
+          // console.log("connected");
+          con.connect(function(err) {
+            if (err) throw err;
+            con.query(`SELECT message,date_message,time_message, users.name FROM one_to_one join users on one_to_one.from_user_id=users.mailtoken  where  (one_to_one.from_user_id="${id2}" AND one_to_one.to_user_id="${id1}")  or (one_to_one.from_user_id="${id1}" AND one_to_one.to_user_id="${id2}") order by date_message desc,one_to_one.time_message desc limit ${start},${count}`, function (err, result, fields) {
+              if (err) return reject(err);
+              if(result)
+              {
+                // console.log(result);
+                resolve(JSON.parse(JSON.stringify(result)));
+                  // resolve(1);
+              }
+            });
+          });
+    })    
+}
+function insert_m2(id1,id2,message,date,time)
+{
+    return new Promise(function(resolve,reject)
+    {
+      var con=connection();
+          // console.log("connected");
+          con.connect(function(err) {
+            if (err) throw err;
+            con.query(`insert into one_to_one values("${id1}","${id2}","${message}","${date}","${time}")`, function (err, result, fields) {
+              if (err) return reject(err);
+              if(result)
+              {
+                // console.log(result);
+                // resolve(JSON.parse(JSON.stringify(result)));
+                  // resolve(1);
+                  con.query(
+                    `SELECT message,date_message,time_message, users.name FROM one_to_one join users on one_to_one.from_user_id=users.mailtoken  where  one_to_one.from_user_id="${id1}" AND one_to_one.to_user_id="${id2}" AND one_to_one.message="${message}" AND one_to_one.date_message="${date}" AND one_to_one.time_message="${time}"`,
+                    function (err, innerResult, fields) {
+                      if (err) return reject(err);
+                      if (innerResult) {
+                        // console.log(innerResult);
+                        resolve(JSON.stringify(innerResult));
+                      }
+                    }
+                  );
+              }
+            });
+          });
+    })    
+}
+function check2(mailToken,id){
+  return new Promise(function(resolve,reject)
+  {
+    var con=connection();
+        // console.log("connected");
+        con.connect(function(err) {
+          if (err) throw err;
+          con.query(`select * from user`, function (err, result, fields) {
+            if (err) return reject(err);
+            if(result)
+            {
+              // console.log(result);
+              resolve(JSON.parse(JSON.stringify(result)));
+                // resolve(1);
+            }
+          });
+        });
+  })   
+}
 module.exports={finduser,createuser,findunique,finduser_2,findtoken,update_valid,update_pass,find,find_g,creategroup,find_f
-,find_details,insert_invite,find_mailtoken,update,find_all,insert_g,find_m,insert_m,find_msg,find_top_group,find_top_user,find_top_region,find_p,check};
+,find_details,insert_invite,find_mailtoken,update,find_all,insert_g,find_m,insert_m,find_msg,find_top_group,find_top_user,find_top_region,find_p,check,getalluser,getuserdetails,insert_m2};
